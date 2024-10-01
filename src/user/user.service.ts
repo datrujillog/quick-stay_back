@@ -43,7 +43,7 @@ export class UserService {
       const user = await this.userModel.findById(userId).exec();
 
       if (!user) {
-        throw new NotFoundException(`Usuario no existe`);
+        throw new NotFoundException(`Usuario no existee`);
       }
 
       return user;
@@ -56,11 +56,11 @@ export class UserService {
 
     const userDB = await this.findOne(id);
 
-    if (!userDB) {
-      throw new NotFoundException(`Usuario no existe`);
-    }
 
-    const user = await this.userModel.updateOne({ _id: id }, { ...updateUserDto });
+    const user = await this.userModel.updateOne({ _id: id }, {
+      ...updateUserDto,
+      updatedAt: new Date().getTime(),
+    });
 
     return user;
   }
