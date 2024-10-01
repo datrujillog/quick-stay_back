@@ -52,11 +52,29 @@ export class UserService {
     throw new NotFoundException(`User with id ${userId} not found`);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+
+    const userDB = await this.findOne(id);
+
+    if (!userDB) {
+      throw new NotFoundException(`Usuario no existe`);
+    }
+
+    const user = await this.userModel.updateOne({ _id: id }, { ...updateUserDto });
+
+    return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(userId: string) {
+
+
+    const { deletedCount } = await this.userModel.deleteOne({ _id: userId }).exec();
+
+    if (deletedCount === 0) {
+      throw new NotFoundException(`Usuario no existe`);
+    }
+
+    console.log(deletedCount);
+    return { message: 'Usuario eliminado' };
   }
 }
