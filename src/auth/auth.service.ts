@@ -4,6 +4,8 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Auth } from './entities/auth.entity';
 import { Model } from 'mongoose';
+import { handleExceptions } from 'src/middleware/handleError.middleare';
+import { encryptPassword } from 'src/common/encrypt/pasword.encrypt';
 
 @Injectable()
 export class AuthService {
@@ -15,29 +17,49 @@ export class AuthService {
 
 
 
-  async authSignup(signupAuthDto: SignupAuthDto) {
+  async create(signupAuthDto: SignupAuthDto) {
 
-    const { email, password, phone, name, lastName, birthDate } = signupAuthDto;
+    let auth: Partial<Auth>;
 
-    console.log('email', signupAuthDto);
-    // console.log('password', password);
-    // console.log('phone', phone);
+    try {
+      let { email, password, phone, name, lastName, birthDate } = signupAuthDto;
 
-    const results = await this.authModel.create({
-      email,
-      password,
-      phone,
-      name,
-      lastName,
-      birthDate,
-      status: 'activo',
-      createdAt: new Date().getTime(),
-      deleted: false,
-      token: 'no token',
-      // token_exp: Date.now(),
-    });
+      if (password) {
+        //encriptar la contraseña
+        password = await encryptPassword(password).then((hash) => {
+          console.log('hash', hash);
+          return hash;
+        });
+      }
 
-    return results;
+      auth = {
+        email,
+        password,
+        phone,
+        name,
+        lastName,
+        birthDate,
+        createdAt: new Date().getTime(),
+        deleted: false,
+        token: 'no token',
+        // token_exp: Date.now(),
+      };
+
+
+      const results = await this.authModel.create({ ...auth });
+
+
+      return results;
+
+
+    } catch (error) {
+      console.log(error);
+      handleExceptions(error);
+
+    }
+
+
+
 
     //verificarque 
 
