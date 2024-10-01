@@ -19,18 +19,17 @@ export class AuthService {
 
     const { email, password, phone, name, lastName, birthDate } = signupAuthDto;
 
-    console.log('email', email);
-    console.log('password', password);
-    console.log('phone', phone);
+    console.log('email', signupAuthDto);
+    // console.log('password', password);
+    // console.log('phone', phone);
 
     const results = await this.authModel.create({
-      // email,
-      // password,
-      // phone,
-      // name,
-      // lastName,
-      // birthDate,
-      ...signupAuthDto,
+      email,
+      password,
+      phone,
+      name,
+      lastName,
+      birthDate,
       status: 'activo',
       createdAt: new Date().getTime(),
       deleted: false,
