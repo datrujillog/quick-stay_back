@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MaxLength, MinLength } from "class-validator";
+import { IsDate, IsEmail, IsString, MaxLength, MinLength } from "class-validator";
 
 export class SignupAuthDto {
 
@@ -14,8 +14,8 @@ export class SignupAuthDto {
     @MinLength(3)
     lastName: string;
 
-    @IsString()
-    birthDate: string;
+    @IsDate()
+    birthDate: Date;
 
     @IsEmail()
     email: string;
