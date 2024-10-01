@@ -15,7 +15,14 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const user = await this.userModel.create(createUserDto);
+      const user = await this.userModel.create({
+        ...createUserDto,
+        status: 'activo',
+        createdAt: Date.now(),
+        deleted: false,
+        token: 'no token',
+        // token_exp: Date.now(),
+      });
       return user;
     } catch (error) {
       console.log(error);
