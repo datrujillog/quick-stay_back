@@ -5,7 +5,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Auth } from './entities/auth.entity';
 import { Model } from 'mongoose';
 import { handleExceptions } from 'src/middleware/handleError.middleare';
-import { encryptPassword } from 'src/common/encrypt/pasword.encrypt';
+import { comparePassword, encryptPassword } from 'src/common/encrypt/pasword.encrypt';
+import { LoginAuthDto } from './dto/login-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -69,22 +70,26 @@ export class AuthService {
   }
 
 
+  async login(loginAuthDto: LoginAuthDto) {
+    const { email, password } = loginAuthDto;
+    const user = await this.authModel.findOne({ email });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const isPasswordValid = await comparePassword(password, user.password);
+
+    // const isPasswordValid = await encryptPassword(password) === user.password;
+
+    if (!isPasswordValid) {
+      throw new Error('Invalid credentials');
+    }
+
+    // Generar token o cualquier otra lógica de autenticación
+    return { message: 'Login successful', token: 'generated-jwt-token' };
+  }
 
 
 
-  // findAll() {
-  //   return `This action returns all auth`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} auth`;
-  // }
-
-  // update(id: number, updateAuthDto: UpdateAuthDto) {
-  //   return `This action updates a #${id} auth`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} auth`;
-  // }
 }
