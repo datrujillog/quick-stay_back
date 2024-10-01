@@ -12,6 +12,9 @@ enum UserStatus {
     Activo = 'activo',
     Inactivo = 'inactivo',
 }
+
+
+@Schema()
 export class Auth extends Document {
 
 
