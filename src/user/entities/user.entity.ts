@@ -23,6 +23,7 @@ export class User extends Document {
   @Prop({
     unique: true,
     index: true,
+    required: true,
   })
   email: string;
 
@@ -40,22 +41,22 @@ export class User extends Document {
   status: UserStatus;
 
   @Prop()
-  created_at: Date;
+  createdAt: number;
 
   @Prop()
-  updated_at: Date;
+  updatedAt?: number;
 
   @Prop()
-  deleted_at: Date;
+  deletedAt?: number;
 
   @Prop()
   deleted?: boolean; // es para saber si el usuario fue eliminado o no
 
   @Prop()
-  token: string;
+  token?: string;
 
   @Prop()
-  token_exp: Date;
+  token_exp?: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
