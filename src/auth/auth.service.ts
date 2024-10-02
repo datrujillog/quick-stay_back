@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignupAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -7,6 +7,7 @@ import { Model } from 'mongoose';
 import { handleExceptions } from 'src/middleware/handleError.middleare';
 import { comparePassword, encryptPassword } from 'src/common/encrypt/pasword.encrypt';
 import { LoginAuthDto } from './dto/login-auth.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
   constructor(
     @InjectModel(Auth.name)
     private readonly authModel: Model<Auth>,
+    private readonly jwtService: JwtService
   ) { }
 
 
@@ -46,25 +48,14 @@ export class AuthService {
         // token_exp: Date.now(),
       };
 
-
       const results = await this.authModel.create({ ...auth });
-
-
       return results;
-
 
     } catch (error) {
       console.log(error);
       handleExceptions(error);
 
     }
-
-
-
-
-    //verificarque 
-
-
 
     return 'This action adds a new auth';
   }
@@ -75,20 +66,21 @@ export class AuthService {
     const user = await this.authModel.findOne({ email });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new UnauthorizedException('User not found');
     }
 
     const isPasswordValid = await comparePassword(password, user.password);
 
-    // const isPasswordValid = await encryptPassword(password) === user.password;
-
     if (!isPasswordValid) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Generar token o cualquier otra lógica de autenticación
-    return { message: 'Login successful', token: 'generated-jwt-token' };
+    const payload = { sub: user._id, role: user.role };
+    const token = this.jwtService.sign(payload);
+
+    return { user, token };
   }
+
 
 
 
